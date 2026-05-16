@@ -1,0 +1,17 @@
+# Build artifacts produced by scripts/package.sh
+audit-repo-security.zip
+audit-repo-security-*.zip
+
+# macOS Finder dandruff
+.DS_Store
+._*
+__MACOSX/
+
+# Editor / OS
+*.swp
+*~
+.idea/
+.vscode/
+
+# Output of running the skill against a target repo (not for committing)
+.security-audit/
