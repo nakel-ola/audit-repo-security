@@ -1,6 +1,12 @@
 ---
 name: audit-repo-security
 description: Use this skill when the user asks to audit an entire repository for security issues (not just a branch or PR). Triggers include "security audit of the repo", "find vulnerabilities in this codebase", "scan the whole project for security bugs", "white-box review the codebase", "static pentest of the repo". Faithfully ports Shannon's AI-pentester methodology (pre-recon → recon → critical-secret triage halt gate → 6 parallel analysis agents → consolidated report) for static repo audits. Each phase has a dedicated prompt file under prompts/. The six analysis agents (phases 3-8) run in parallel in a single message, but only after the Phase 2.5 secret-triage gate clears.
+license: MIT
+compatibility:
+  - claude-code
+metadata:
+  version: 0.3.4
+  homepage: https://github.com/nakel-ola/audit-repo-security
 ---
 
 # Audit Repo Security

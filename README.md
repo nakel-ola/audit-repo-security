@@ -76,6 +76,9 @@ audit-repo-security/
     02b-secret-triage.md
   schemas/
     findings-queue.md                     # per-class record schemas + slot taxonomy
+  scripts/
+    package.sh                            # clean-zip builder (runs validate.sh first)
+    validate.sh                           # pre-flight checks: JSON, files, sidecars, schema notation
   CHANGELOG.md
   LICENSE
 ```

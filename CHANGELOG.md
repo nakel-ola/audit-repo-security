@@ -4,6 +4,18 @@ All notable changes to `audit-repo-security`.
 
 The format roughly follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions are pre-1.0 and not API-stable.
 
+## 0.3.4 — 2026-05-16
+
+Made the skill installable via the Skills CLI ecosystem (`npx skills add`).
+
+### Added
+- **`license`, `compatibility`, and `metadata` frontmatter fields** in `SKILL.md`. Compatible with the Skills CLI spec referenced at https://skills.sh. Version is now declared as `metadata.version: 0.3.4` for the CLI's `skills update` flow.
+- **`npx skills add nakel-ola/audit-repo-security` install instructions** in README (both global `-g` and project scope).
+- Update path via `npx skills update` documented.
+
+### Notes
+- Repo layout matches the Skills CLI spec for a **single-skill repo**: `SKILL.md` at the root, supporting files (`prompts/`, `schemas/`, `scripts/`) as siblings. No manifest file required.
+
 ## 0.3.3 — 2026-05-16
 
 Round-six polish.
