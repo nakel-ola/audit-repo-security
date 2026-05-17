@@ -46,7 +46,7 @@ required=(
   prompts/06-vuln-authz.md prompts/07-vuln-ssrf.md prompts/08-supply-chain.md
   prompts/09-report.md
   schemas/findings-queue.md
-  scripts/package.sh scripts/validate.sh
+  scripts/validate.sh
 )
 missing=()
 for f in "${required[@]}"; do
@@ -68,7 +68,7 @@ declare -a referenced=(
   prompts/06-vuln-authz.md prompts/07-vuln-ssrf.md prompts/08-supply-chain.md
   prompts/09-report.md
   schemas/findings-queue.md
-  scripts/package.sh
+  scripts/validate.sh
 )
 broken=()
 for f in "${referenced[@]}"; do

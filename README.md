@@ -43,17 +43,71 @@ Each finding is recorded against a per-class strict-JSON schema (see `schemas/fi
 
 Add `.security-audit/` to `.gitignore` — these reports document vulnerabilities by file:line and should not be committed before fixes ship.
 
+## Security & threat model
+
+This skill grants the agent capabilities you should think about before pointing it at a repo you don't trust.
+
+### What it does at runtime
+
+- Reads files across the entire repository (Read, Glob).
+- Runs shell commands via Bash, including `git log -p` over the last 50 commits during Phase 2.5 secret triage.
+- Spawns up to six parallel sub-agents (Phase 3-8) with the same toolset.
+- Writes findings under `.security-audit/` in the working directory.
+- In Phase 8, invokes package-advisory tools (`npm audit`, `pnpm audit`, `pip-audit --requirement`, `cargo audit`, `bundler-audit`, optionally `osv-scanner`) and may call `https://api.osv.dev/v1/query` via WebFetch.
+
+### What it explicitly does NOT do
+
+- It does not execute the audited application's code. No `node`, `python`, `ruby`, `go run`, `npm install`, `pnpm install`, `pip install`, build scripts, test runners, or package lifecycle scripts (see the package-audit safety rules in `prompts/08-supply-chain.md`).
+- It does not modify the audited repo. `.security-audit/` is the only write target. `node_modules/`, lockfiles, and tracked source are untouched.
+- It does not exfiltrate findings. All output is local under `.security-audit/`.
+- It does not execute witness payloads recorded in findings — they are static examples for the consumer of the report to verify.
+
+### Recommended posture
+
+| Repo trust level | Recommendation |
+|---|---|
+| Your own code | Run normally. |
+| Trusted third party (vendor you have a relationship with) | Run normally; review the report before sharing. |
+| Untrusted / actively hostile | Run inside a container with no network and no host mounts beyond a read-only repo bind. Disable Phase 8's WebFetch step. The package-audit tools are advisory-only, but lockfile contents are still attacker-controlled input. |
+
 ## Install
 
-Drop the directory into your project (or your global skills dir):
+Two install paths. Pick whichever fits your workflow.
 
+### `npx skills add` (managed updates)
+
+Use this if you want the Skills CLI to track the install and handle updates for you.
+
+```bash
+# Global (available across all projects):
+npx skills add nakel-ola/audit-repo-security -g
+
+# Project (committed with your repo, shared with your team):
+npx skills add nakel-ola/audit-repo-security
+
+# Update later:
+npx skills update
 ```
-.claude/skills/audit-repo-security/
+
+### `git clone` (full control, no Node required)
+
+Use this if you don't have Node, prefer not to add a CLI dependency, or want to vendor the skill at a pinned commit.
+
+```bash
+# Project scope:
+git clone https://github.com/nakel-ola/audit-repo-security \
+  .claude/skills/audit-repo-security
+
+# Global scope:
+git clone https://github.com/nakel-ola/audit-repo-security \
+  ~/.claude/skills/audit-repo-security
 ```
 
-Or symlink/copy from a clone of this repo.
+Update with `git pull` from inside the install directory.
 
-Once installed, invoke from Claude Code with any phrasing the skill description matches: "audit this repo for security issues", "find vulnerabilities in this codebase", "white-box review the codebase", "static pentest of the repo", etc.
+---
+
+Once installed, restart Claude Code. Invoke with any phrasing the skill description matches: "audit this repo for security issues", "find vulnerabilities in this codebase", "white-box review the codebase", "static pentest of the repo", etc.
 
 You can also optionally pass path filters when invoking — focus on specific subtrees or skip vendored code.
 
@@ -66,6 +120,7 @@ audit-repo-security/
   prompts/
     01-pre-recon.md
     02-recon.md
+    02b-secret-triage.md
     03-vuln-injection.md
     04-vuln-xss.md
     05-vuln-auth.md
@@ -73,15 +128,31 @@ audit-repo-security/
     07-vuln-ssrf.md
     08-supply-chain.md
     09-report.md
-    02b-secret-triage.md
   schemas/
     findings-queue.md                     # per-class record schemas + slot taxonomy
   scripts/
-    package.sh                            # clean-zip builder (runs validate.sh first)
-    validate.sh                           # pre-flight checks: JSON, files, sidecars, schema notation
+    validate.sh                           # repo-level regression check (not run at install time)
   CHANGELOG.md
   LICENSE
 ```
+
+## Maintainer workflow
+
+`scripts/validate.sh` is a repo-level regression check for people editing the skill, not something end users run. It verifies:
+
+- No macOS sidecars committed (`._*`, `.DS_Store`, `__MACOSX/`).
+- Every fenced `` ```json `` block in the prompts and schemas parses cleanly.
+- All required prompt/schema files exist.
+- The Layout block above references real files.
+- No stale `med` confidence values, no pipe-delimited fake-JSON enum strings.
+
+Run before opening a PR:
+
+```bash
+./scripts/validate.sh
+```
+
+If you wire it into CI as a GitHub Action on `push` and `pull_request`, regressions get caught automatically.
 
 ## Methodology and attribution
 

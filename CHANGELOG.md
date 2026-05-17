@@ -4,6 +4,17 @@ All notable changes to `audit-repo-security`.
 
 The format roughly follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions are pre-1.0 and not API-stable.
 
+## 0.3.5 — 2026-05-16
+
+Response to Socket's medium-risk classification (capability-level concern, no specific bugs).
+
+### Added
+- **`Security & threat model` section in README.** Documents what the skill does at runtime (Read/Glob across the repo, Bash for `git log -p`, parallel sub-agents, advisory tools in Phase 8, optional WebFetch to OSV) and what it explicitly does not do (no application-code execution, no install/build/test scripts, no repo-state mutation outside `.security-audit/`, no exfiltration, no witness-payload execution). Trust-level posture table recommends sandboxing for actively-hostile repos.
+- **`Threat model` paragraph in `SKILL.md`.** Reminds the orchestrator that sub-agents inherit the safety posture and that the no-execution / no-install / no-mutation rules in each charter must not be relaxed inline.
+
+### Notes
+- No code or finding-schema changes. The skill's runtime behavior is unchanged; this release only documents the existing safety posture so users and scanners can see it without reading every charter.
+
 ## 0.3.4 — 2026-05-16
 
 Made the skill installable via the Skills CLI ecosystem (`npx skills add`).

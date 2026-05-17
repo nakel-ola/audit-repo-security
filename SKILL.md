@@ -26,6 +26,10 @@ Do not use this skill for:
 - Live pentesting against a running target (out of scope).
 - Single-file or single-bug analysis (use `/debug` or direct conversation).
 
+## Threat model
+
+Sub-agents you spawn inherit the orchestrator's safety posture. Each charter under `prompts/` already encodes the rules: no execution of application code, no install/build/test/lifecycle scripts, no repo-state mutation outside `.security-audit/`, witness payloads recorded only and never executed. **Do not relax these in the invocation prompt.** If you reword a charter inline, preserve the safety paragraphs verbatim. The user-facing threat-model summary lives in `README.md`.
+
 ## Required runtime tools
 
 This skill is written for Claude Code's tool surface. Required:
